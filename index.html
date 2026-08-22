@@ -451,7 +451,8 @@
   <p class="tap-label">tap to start</p>
 </div>
 
-<audio id="bgm" loop></audio>
+<audio id="bgm-a" loop></audio>
+<audio id="bgm-b" loop></audio>
 
 <section id="hero">
   <div class="road">
@@ -632,7 +633,11 @@ const TRACKS = {
   quiz: "quiz-track.mp3"
 };
 
-const bgm = document.getElementById("bgm");
+const bgmA = document.getElementById("bgm-a");
+const bgmB = document.getElementById("bgm-b");
+let activePlayer = bgmA;
+let idlePlayer = bgmB;
+let fadeTimer = null;
 
 function spawnParticles(x, y){
   const colors = ["var(--pink)", "var(--cyan)", "var(--amber)"];
@@ -650,13 +655,39 @@ function spawnParticles(x, y){
     setTimeout(() => p.remove(), 600);
   }
 }
+
 function playTrack(name){
   const src = TRACKS[name];
   if(!src) return;
-  if(bgm.getAttribute("src") !== src){
-    bgm.setAttribute("src", src);
-  }
-  bgm.play().catch(() => {});
+
+  const incoming = idlePlayer;
+  const outgoing = activePlayer;
+  const duration = 1200;
+  const steps = 24;
+  const stepTime = duration / steps;
+
+  incoming.setAttribute("src", src);
+  incoming.volume = 0;
+  incoming.currentTime = 0;
+  incoming.play().catch(() => {});
+
+  if(fadeTimer) clearInterval(fadeTimer);
+
+  let i = 0;
+  fadeTimer = setInterval(() => {
+    i++;
+    const t = i / steps;
+    incoming.volume = Math.min(1, t);
+    outgoing.volume = Math.max(0, 1 - t);
+    if(i >= steps){
+      clearInterval(fadeTimer);
+      outgoing.pause();
+      outgoing.volume = 1;
+    }
+  }, stepTime);
+
+  activePlayer = incoming;
+  idlePlayer = outgoing;
 }
 
 document.getElementById("tap-screen").addEventListener("click", () => {
