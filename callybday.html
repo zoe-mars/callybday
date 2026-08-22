@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>im buying you subwoofers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root{
+    --bg: #08090c;
+    --panel: #101319;
+    --line: #232838;
+    --text: #e8eaf0;
+    --text-dim: #8891a3;
+    --pink: #ff2e88;
+    --cyan: #2ee6ff;
+    --amber: #ffb92e;
+    --car: #c7c19a;
+    --car-dark: #a6a17e;
+    --car-glass: #1c2a30;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    overflow-x:hidden;
+    background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 7px);
+  }
+  .pixel{
+    font-family:'Press Start 2P', monospace;
+    text-transform:uppercase;
+  }
+
+  /* ---------- tap to start ---------- */
+  #tap-screen{
+    position:fixed;
+    inset:0;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    cursor:pointer;
+    transition:opacity .5s ease;
+  }
+  #tap-screen.hide{
+    opacity:0;
+    pointer-events:none;
+  }
+  .tap-label{
+    font-family:'Press Start 2P', monospace;
+    font-size:13px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text);
+    text-shadow:2px 2px 0 var(--pink);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:.5;}
+    50%{opacity:1;}
+  }
+
+  /* ---------- hero ---------- */
+  #hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:32px 20px;
+    position:relative;
+  }
+  .road{
+    position:relative;
+    width:100%;
+    max-width:520px;
+    height:210px;
+    margin-bottom:8px;
+    overflow:hidden;
+  }
+  .road-line{
+    position:absolute;
+    bottom:22px;
+    left:0;
+    width:100%;
+    height:2px;
+    background-image:repeating-linear-gradient(90deg, var(--line) 0 16px, transparent 16px 30px);
+  }
+  .car-wrap{
+    position:absolute;
+    bottom:22px;
+    left:-40%;
+    width:260px;
+    opacity:0;
+  }
+  .car-wrap.drive{
+    animation:driveIn 1.7s cubic-bezier(.2,.7,.3,1) forwards, bounce 1.5s ease-in-out infinite;
+    transform-origin:bottom center;
+  }
+  @keyframes driveIn{
+    0%{ left:-40%; opacity:1; }
+    100%{ left:32%; opacity:1; }
+  }
+  @keyframes bounce{
+    0%{ transform:translateY(0) scaleY(1) scaleX(1) rotate(0deg); }
+    10%{ transform:translateY(3px) scaleY(0.85) scaleX(1.12) rotate(0deg); }
+    26%{ transform:translateY(-18px) scaleY(1.14) scaleX(0.91) rotate(-2deg); }
+    42%{ transform:translateY(-18px) scaleY(1.1) scaleX(0.93) rotate(-2deg); }
+    58%{ transform:translateY(-8px) scaleY(1.02) scaleX(0.98) rotate(1deg); }
+    74%{ transform:translateY(2px) scaleY(0.86) scaleX(1.1) rotate(0deg); }
+    88%{ transform:translateY(-4px) scaleY(1.04) scaleX(0.98) rotate(0deg); }
+    100%{ transform:translateY(0) scaleY(1) scaleX(1) rotate(0deg); }
+  }
+  .car-wrap svg{
+    width:100%;
+    height:auto;
+    display:block;
+    shape-rendering:crispEdges;
+  }
+  .notes{
+    position:absolute;
+    top:0;
+    left:50%;
+    width:0;
+    height:0;
+  }
+  .note{
+    position:absolute;
+    font-size:20px;
+    opacity:0;
+  }
+  .note.n1{ color:var(--cyan); left:-40px; animation:noteFloat1 1.6s ease-out infinite; animation-delay:0s; }
+  .note.n2{ color:var(--pink); left:20px; animation:noteFloat2 1.6s ease-out infinite; animation-delay:0.55s; }
+  .note.n3{ color:var(--amber); left:-8px; animation:noteFloat3 1.6s ease-out infinite; animation-delay:1.05s; }
+  @keyframes noteFloat1{
+    0%{ opacity:0; transform:translate(0,0) scale(0.6) rotate(0deg); }
+    12%{ opacity:1; }
+    100%{ opacity:0; transform:translate(-38px,-70px) scale(1.15) rotate(-18deg); }
+  }
+  @keyframes noteFloat2{
+    0%{ opacity:0; transform:translate(0,0) scale(0.6) rotate(0deg); }
+    12%{ opacity:1; }
+    100%{ opacity:0; transform:translate(44px,-64px) scale(1.15) rotate(20deg); }
+  }
+  @keyframes noteFloat3{
+    0%{ opacity:0; transform:translate(0,0) scale(0.6) rotate(0deg); }
+    12%{ opacity:1; }
+    100%{ opacity:0; transform:translate(4px,-78px) scale(1.2) rotate(-6deg); }
+  }
+
+  .hero-text{
+    text-align:center;
+    max-width:520px;
+    width:100%;
+  }
+  .hero-line{
+    margin:0;
+    opacity:0;
+  }
+  .hero-line.show{
+    animation:fadeUp .7s ease forwards;
+  }
+  .hero-line svg{
+    width:100%;
+    max-width:500px;
+    height:auto;
+    display:block;
+    margin:0 auto;
+    shape-rendering:crispEdges;
+  }
+  .subwoofers-stretch{
+    transform-box:fill-box;
+    transform-origin:center;
+    transform:scale(1.1, 0.95);
+  }
+
+  .subline{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    color:var(--text-dim);
+    margin-top:14px;
+    opacity:0;
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:10px 4px;
+  }
+  .subline.show{
+    animation:swipeIn .6s ease forwards;
+  }
+  .subline .arrow{
+    color:var(--cyan);
+    font-size:20px;
+    animation:nudge 1.2s ease-in-out infinite;
+  }
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes swipeIn{
+    from{ opacity:0; transform:translateX(-14px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  @keyframes nudge{
+    0%,100%{ transform:translateX(0); }
+    50%{ transform:translateX(5px); }
+  }
+
+  /* ---------- quiz (unchanged behaviour) ---------- */
+  #quiz-section{
+    display:flex;
+    justify-content:center;
+    padding:60px 16px 40px;
+  }
+  .quiz{
+    width:100%;
+    max-width:560px;
+  }
+  #quiz-section .kicker{
+    font-family:'Press Start 2P', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--cyan);
+    margin:0 0 12px;
+  }
+  #quiz-section h1{
+    font-family:'Press Start 2P', monospace;
+    font-size:clamp(13px, 4.6vw, 19px);
+    line-height:2;
+    margin:0 0 32px;
+    text-shadow:2px 2px 0 rgba(0,0,0,.5);
+  }
+  #quiz-section h1 span{
+    color:var(--pink);
+    text-shadow:2px 2px 0 var(--cyan);
+  }
+
+  .step{ display:none; }
+  .step.active{ display:block; }
+
+  .progress{
+    display:flex;
+    gap:6px;
+    margin-bottom:28px;
+  }
+  .progress div{
+    height:3px;
+    flex:1;
+    background:var(--line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .progress div i{
+    display:block;
+    height:100%;
+    width:0%;
+    background:var(--pink);
+    transition:width .3s ease;
+  }
+  .progress div.done i{width:100%;}
+  .progress div.active i{width:100%;background:var(--cyan);}
+
+  .q{
+    font-family:'Press Start 2P', monospace;
+    font-size:13px;
+    line-height:1.8;
+    font-weight:normal;
+    margin:0 0 20px;
+  }
+  .opt{
+    width:100%;
+    text-align:left;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:16px 18px;
+    border-radius:10px;
+    font-family:'Press Start 2P', monospace;
+    font-size:10px;
+    line-height:1.7;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .opt:hover{
+    border-color:var(--cyan);
+    background:#141926;
+  }
+  .opt.picked{
+    border-color:var(--pink);
+    background:#1a1220;
+  }
+  .opt .label{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    margin-bottom:4px;
+  }
+
+  .back{
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    cursor:pointer;
+    padding:0;
+    margin-top:8px;
+  }
+  .back:hover{color:var(--text);}
+
+  .result{ display:none; }
+  .result.active{ display:block; }
+  .tag{
+    display:inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--amber);
+    border:1px solid var(--amber);
+    padding:4px 10px;
+    border-radius:20px;
+    margin-bottom:16px;
+  }
+  .result h2{
+    font-family:'Press Start 2P', monospace;
+    font-size:clamp(14px, 5vw, 20px);
+    line-height:1.7;
+    margin:0 0 16px;
+    color:var(--text);
+    text-shadow:2px 2px 0 var(--pink);
+  }
+  .result p{
+    color:var(--text-dim);
+    font-size:15px;
+    line-height:1.6;
+    margin:0 0 24px;
+  }
+  .buy{
+    display:inline-block;
+    background:var(--pink);
+    color:#08090c;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:500;
+    font-size:14px;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:8px;
+    margin:0 0 24px;
+  }
+  .buy:hover{background:#ff4d9a;}
+
+  .restart{
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .restart:hover{border-color:var(--cyan);}
+
+  /* ---------- footer cat ---------- */
+  #cat-footer{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:40px 20px 60px;
+  }
+  #cat-footer svg{
+    width:190px;
+    height:auto;
+    shape-rendering:crispEdges;
+  }
+  .cat-body{
+    animation:catDance 0.9s ease-in-out infinite;
+    transform-origin:bottom center;
+    transform-box:fill-box;
+  }
+  @keyframes catDance{
+    0%{ transform:translateY(0) scaleY(1) scaleX(1) rotate(0deg); }
+    20%{ transform:translateY(-7px) scaleY(1.07) scaleX(0.95) rotate(-3deg); }
+    40%{ transform:translateY(0) scaleY(0.94) scaleX(1.05) rotate(2deg); }
+    60%{ transform:translateY(-5px) scaleY(1.05) scaleX(0.97) rotate(-2deg); }
+    80%{ transform:translateY(0) scaleY(0.97) scaleX(1.02) rotate(1deg); }
+    100%{ transform:translateY(0) scaleY(1) scaleX(1) rotate(0deg); }
+  }
+  .cnote{
+    opacity:0;
+    transform-box:fill-box;
+    transform-origin:center;
+  }
+  .cnote.cn1{ animation:cnoteFloat1 1.4s ease-out infinite; animation-delay:0s; }
+  .cnote.cn2{ animation:cnoteFloat2 1.4s ease-out infinite; animation-delay:0.45s; }
+  .cnote.cn3{ animation:cnoteFloat3 1.4s ease-out infinite; animation-delay:0.9s; }
+  @keyframes cnoteFloat1{
+    0%{ opacity:0; transform:translate(0,0) scale(0.6) rotate(0deg); }
+    12%{ opacity:1; }
+    100%{ opacity:0; transform:translate(-16px,-24px) scale(1.1) rotate(-15deg); }
+  }
+  @keyframes cnoteFloat2{
+    0%{ opacity:0; transform:translate(0,0) scale(0.6) rotate(0deg); }
+    12%{ opacity:1; }
+    100%{ opacity:0; transform:translate(18px,-22px) scale(1.1) rotate(18deg); }
+  }
+  @keyframes cnoteFloat3{
+    0%{ opacity:0; transform:translate(0,0) scale(0.6) rotate(0deg); }
+    12%{ opacity:1; }
+    100%{ opacity:0; transform:translate(2px,-26px) scale(1.15) rotate(-6deg); }
+  }
+  .driver-cone{
+    animation:conePulse 0.4s ease-in-out infinite;
+    transform-box:fill-box;
+    transform-origin:center;
+  }
+  .driver-cone.dc1{ animation-delay:0s; }
+  .driver-cone.dc2{ animation-delay:0.12s; }
+  .driver-cone.dc3{ animation-delay:0.2s; }
+  .driver-cone.dc4{ animation-delay:0.08s; }
+  @keyframes conePulse{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(0.8); }
+  }  .particle{
+    position:fixed;
+    width:6px;
+    height:6px;
+    border-radius:1px;
+    pointer-events:none;
+    z-index:500;
+    animation:particlePop 0.55s ease-out forwards;
+  }
+  @keyframes particlePop{
+    0%{ transform:translate(0,0) scale(1); opacity:1; }
+    100%{ transform:translate(var(--px), var(--py)) scale(0.3); opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="tap-screen">
+  <p class="tap-label">tap to start</p>
+</div>
+
+<audio id="bgm" loop></audio>
+
+<section id="hero">
+  <div class="road">
+    <div class="road-line"></div>
+    <div class="car-wrap" id="car-wrap">
+      <div class="notes">
+        <span class="note n1">&#9835;</span>
+        <span class="note n2">&#9834;</span>
+        <span class="note n3">&#9835;</span>
+      </div>
+      <svg viewBox="0 0 170 90" xmlns="http://www.w3.org/2000/svg">
+        <rect x="18" y="66" width="134" height="6" fill="var(--car-dark)"/>
+        <rect x="26" y="40" width="112" height="30" fill="var(--car)"/>
+        <rect x="46" y="20" width="70" height="24" fill="var(--car)"/>
+        <rect x="52" y="24" width="26" height="16" fill="var(--car-glass)"/>
+        <rect x="82" y="24" width="26" height="16" fill="var(--car-glass)"/>
+        <rect x="26" y="40" width="112" height="4" fill="var(--car-dark)"/>
+        <rect x="18" y="60" width="10" height="8" fill="#151516"/>
+        <rect x="140" y="60" width="10" height="8" fill="#151516"/>
+        <rect x="20" y="50" width="8" height="8" fill="#ff5a5a"/>
+        <rect x="140" y="50" width="8" height="8" fill="#ffe17a"/>
+        <rect x="38" y="70" width="26" height="14" fill="#151516"/>
+        <rect x="104" y="70" width="26" height="14" fill="#151516"/>
+        <rect x="44" y="76" width="14" height="8" fill="#3a3a3c"/>
+        <rect x="110" y="76" width="14" height="8" fill="#3a3a3c"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="hero-text">
+    <div class="hero-line" id="hero-line1">
+      <svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" font-family="'Press Start 2P', monospace">
+        <rect x="0" y="0" width="480" height="230" fill="var(--bg)"/>
+
+        <rect x="38" y="10" width="4" height="4" fill="var(--amber)" opacity="0.8"/>
+        <rect x="428" y="6" width="5" height="5" fill="var(--cyan)" opacity="0.7"/>
+        <circle cx="16" cy="30" r="2.6" fill="var(--pink)" opacity="0.7"/>
+        <circle cx="456" cy="24" r="2.2" fill="var(--amber)" opacity="0.8"/>
+
+        <text x="242" y="38" text-anchor="middle" font-size="13" fill="var(--pink)" opacity="0.9">I'M BUYING YOU</text>
+        <text x="240" y="35" text-anchor="middle" font-size="13" fill="var(--text)" style="paint-order:stroke; stroke:#0a0a0a; stroke-width:4; stroke-linejoin:round;">I'M BUYING YOU</text>
+
+        <g class="subwoofers-stretch">
+          <text x="256" y="140" text-anchor="middle" font-size="40" letter-spacing="-6" fill="#180d13">SUBWOOFERS</text>
+          <text x="250" y="134" text-anchor="middle" font-size="40" letter-spacing="-6" fill="var(--pink)">SUBWOOFERS</text>
+          <text x="244" y="128" text-anchor="middle" font-size="40" letter-spacing="-6" fill="var(--cyan)" style="paint-order:stroke; stroke:#0a0a0a; stroke-width:9; stroke-linejoin:round;">SUBWOOFERS</text>
+        </g>
+
+        <rect x="22" y="212" width="3" height="3" fill="var(--cyan)" opacity="0.7"/>
+        <rect x="170" y="214" width="3" height="3" fill="var(--pink)" opacity="0.6"/>
+        <rect x="438" y="212" width="4" height="4" fill="var(--amber)" opacity="0.7"/>
+        <circle cx="80" cy="214" r="1.6" fill="var(--pink)" opacity="0.6"/>
+        <circle cx="280" cy="216" r="2" fill="var(--cyan)" opacity="0.6"/>
+      </svg>
+    </div>
+    <button class="subline" id="hero-arrow">but which ones... <span class="arrow">&rarr;</span></button>
+  </div>
+</section>
+
+<section id="quiz-section">
+<div class="quiz">
+
+  <p class="kicker" style="opacity:1;">SPECS QUIZ</p>
+
+  <div class="progress">
+    <div class="q1"><i></i></div>
+    <div class="q2"><i></i></div>
+    <div class="q3"><i></i></div>
+  </div>
+
+  <div class="step active" data-step="1">
+    <p class="q">Where will it go?</p>
+    <button class="opt" data-q="1" data-v="A"><span class="label">A</span>Under a seat. Improved sound while keeping the boot clear</button>
+    <button class="opt" data-q="1" data-v="B"><span class="label">B</span>In the boot. Primo sound but takes up space</button>
+    <button class="opt" data-q="1" data-v="C"><span class="label">C</span>Whatever fits best</button>
+  </div>
+
+  <div class="step" data-step="2">
+    <p class="q">One or two?</p>
+    <button class="opt" data-q="2" data-v="A"><span class="label">A</span>Single sub (standard)</button>
+    <button class="opt" data-q="2" data-v="B"><span class="label">B</span>Dual subs to go LOUD :0</button>
+    <button class="opt" data-q="2" data-v="C"><span class="label">C</span>Don't care, just make it good</button>
+    <button class="back" data-back="1">back</button>
+  </div>
+
+  <div class="step" data-step="3">
+    <p class="q">Quality to doof ratio?</p>
+    <button class="opt" data-q="3" data-v="A"><span class="label">A</span>Sound quality and balanced volume</button>
+    <button class="opt" data-q="3" data-v="B"><span class="label">B</span>FARKED BASS</button>
+    <button class="opt" data-q="3" data-v="C"><span class="label">C</span>A mix of both</button>
+    <button class="back" data-back="2">back</button>
+  </div>
+
+  <div class="result" data-step="result">
+    <h2 id="res-title"></h2>
+    <p id="res-body"></p>
+    <a class="buy" id="res-link" target="_blank" rel="noopener">buy this one &rarr;</a>
+    <button class="restart" id="restart">start over</button>
+  </div>
+
+</div>
+</section>
+
+<section id="cat-footer">
+  <svg viewBox="0 0 160 132" xmlns="http://www.w3.org/2000/svg">
+
+    <rect x="10" y="92" width="140" height="34" fill="#241c18"/>
+    <rect x="18" y="98" width="124" height="22" fill="#120e0b"/>
+    <circle cx="50" cy="109" r="9" fill="#3a2e26"/>
+    <circle cx="50" cy="109" r="6.5" fill="none" stroke="#5a493c" stroke-width="1"/>
+    <g class="driver-cone dc1">
+      <circle cx="50" cy="109" r="6.5" fill="#120e0b"/>
+      <circle cx="50" cy="109" r="2.2" fill="#6b5a4a"/>
+    </g>
+    <circle cx="110" cy="109" r="9" fill="#3a2e26"/>
+    <circle cx="110" cy="109" r="6.5" fill="none" stroke="#5a493c" stroke-width="1"/>
+    <g class="driver-cone dc2">
+      <circle cx="110" cy="109" r="6.5" fill="#120e0b"/>
+      <circle cx="110" cy="109" r="2.2" fill="#6b5a4a"/>
+    </g>
+    <rect x="12" y="94" width="4" height="4" fill="#9a948a"/>
+    <rect x="144" y="94" width="4" height="4" fill="#9a948a"/>
+    <rect x="12" y="122" width="4" height="4" fill="#9a948a"/>
+    <rect x="144" y="122" width="4" height="4" fill="#9a948a"/>
+
+    <rect x="26" y="54" width="108" height="32" fill="#2a201b"/>
+    <rect x="34" y="60" width="92" height="20" fill="#120e0b"/>
+    <circle cx="56" cy="70" r="7" fill="#3a2e26"/>
+    <circle cx="56" cy="70" r="5" fill="none" stroke="#5a493c" stroke-width="1"/>
+    <g class="driver-cone dc3">
+      <circle cx="56" cy="70" r="5" fill="#120e0b"/>
+      <circle cx="56" cy="70" r="1.8" fill="#6b5a4a"/>
+    </g>
+    <circle cx="104" cy="70" r="7" fill="#3a2e26"/>
+    <circle cx="104" cy="70" r="5" fill="none" stroke="#5a493c" stroke-width="1"/>
+    <g class="driver-cone dc4">
+      <circle cx="104" cy="70" r="5" fill="#120e0b"/>
+      <circle cx="104" cy="70" r="1.8" fill="#6b5a4a"/>
+    </g>
+    <rect x="28" y="56" width="4" height="4" fill="#9a948a"/>
+    <rect x="128" y="56" width="4" height="4" fill="#9a948a"/>
+    <rect x="28" y="78" width="4" height="4" fill="#9a948a"/>
+    <rect x="128" y="78" width="4" height="4" fill="#9a948a"/>
+
+    <g class="cat-notes">
+      <text class="cnote cn1" x="26" y="16" font-size="10" fill="var(--cyan)">&#9835;</text>
+      <text class="cnote cn2" x="52" y="12" font-size="10" fill="var(--pink)">&#9834;</text>
+      <text class="cnote cn3" x="40" y="18" font-size="10" fill="var(--amber)">&#9835;</text>
+    </g>
+    <g class="cat-body">
+      <ellipse cx="80" cy="44" rx="46" ry="18" fill="#5E442F"/>
+      <ellipse cx="80" cy="44" rx="46" ry="18" fill="none"/>
+      <rect x="40" y="30" width="10" height="10" fill="#36271C"/>
+      <rect x="70" y="28" width="10" height="8" fill="#36271C"/>
+      <rect x="100" y="32" width="10" height="8" fill="#36271C"/>
+      <path d="M118 42 q18 -4 20 14 q-10 4 -18 -4 q-6 -4 -2 -10 z" fill="#5E442F"/>
+      <circle cx="42" cy="34" r="9" fill="#5E442F"/>
+      <polygon points="34,28 38,18 42,28" fill="#5E442F"/>
+      <polygon points="46,28 50,18 54,28" fill="#5E442F"/>
+      <polygon points="36,26 38,21 40,26" fill="#3f2a1e"/>
+      <polygon points="48,26 50,21 52,26" fill="#3f2a1e"/>
+      <circle cx="38" cy="31" r="1.7" fill="#1c1410"/>
+      <circle cx="46" cy="31" r="1.7" fill="#1c1410"/>
+      <circle cx="37.2" cy="30.2" r="0.6" fill="#fff"/>
+      <circle cx="45.2" cy="30.2" r="0.6" fill="#fff"/>
+      <path d="M35 35 q7 3 14 0" stroke="#2a1c12" stroke-width="1.4" fill="none"/>
+      <line x1="42" y1="37" x2="42" y2="39" stroke="#2a1c12" stroke-width="1.2"/>
+    </g>
+  </svg>
+</section>
+
+
+
+<script>
+
+const TRACKS = {
+  hero: "hero-track.mp3",
+  quiz: "quiz-track.mp3"
+};
+
+const bgm = document.getElementById("bgm");
+
+function spawnParticles(x, y){
+  const colors = ["var(--pink)", "var(--cyan)", "var(--amber)"];
+  for(let i = 0; i < 6; i++){
+    const p = document.createElement("div");
+    p.className = "particle";
+    const angle = (Math.PI * 2 / 6) * i + Math.random() * 0.5;
+    const dist = 20 + Math.random() * 16;
+    p.style.setProperty("--px", Math.cos(angle) * dist + "px");
+    p.style.setProperty("--py", Math.sin(angle) * dist + "px");
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+    p.style.background = colors[i % colors.length];
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 600);
+  }
+}
+function playTrack(name){
+  const src = TRACKS[name];
+  if(!src) return;
+  if(bgm.getAttribute("src") !== src){
+    bgm.setAttribute("src", src);
+  }
+  bgm.play().catch(() => {});
+}
+
+document.getElementById("tap-screen").addEventListener("click", () => {
+  document.getElementById("tap-screen").classList.add("hide");
+  playTrack("hero");
+
+  document.getElementById("car-wrap").classList.add("drive");
+
+  setTimeout(() => document.getElementById("hero-line1").classList.add("show"), 2500);
+  setTimeout(() => document.getElementById("hero-arrow").classList.add("show"), 3500);
+}, { once:true });
+
+document.getElementById("hero-arrow").addEventListener("click", (e) => {
+  spawnParticles(e.clientX, e.clientY);
+  playTrack("quiz");
+  document.getElementById("quiz-section").scrollIntoView({ behavior:"smooth" });
+});
+
+/*
+   quiz logic
+*/
+const answers = {1:null, 2:null, 3:null};
+
+const results = {
+  "trunk_single_bigbass": {title:"Rockford Fosgate P500-12P", body:"12 inch driver, ported box, 500W RMS, built in amp. Sits in the boot against the seatback. Test if it could be concealed in your spare tire compartment. Punchy bass!", link:"https://www.sonicelectronix.com/item-199989-Rockford-Fosgate-P500-12P.html"},
+  "trunk_dual_bigbass": {title:"Ground Zero GZIB 2-30BR ACT", body:"Dude why? It takes up so much trunk space... Dual chamber ported enclosure. You'll feel the bass in your chest!", link:"https://automotivesuperstore.com.au/ground-zero-gzib-2-30br-act?utm_source=google&utm_medium=cpc&gad_source=1&gad_campaignid=21863213704&gbraid=0AAAAADhr_hWPDVddwFCAXRn_ozSaYQ2WQ&gclid=EAIaIQobChMI4q-L4u2ylgMV3ZVmAh1m-BosEAQYCyACEgIetPD_BwE"},
+  "trunk_single_balanced": {title:"Rockford Fosgate P300-12", body:"12 inch driver, sealed box, 300W RMS. Sits in the boot against the seatback. Test if it could be concealed in your spare tire compartment!", link:"https://ebay.com/itm/323680903417"},
+  "trunk_dual_balanced": {title:"Two sealed subs, shared amp", body:"There's no obvious set to pick for this combo, but we can get your choice of equipment installed! Two separate sealed subs on a shared amp, maybe a pair of Rockford Fosgate R2 8 or 10 inch sealed subs, or two JL Audio 8 inch sealed units and an amp. I may not be able to cover all of this + install right away but we can make it happen :D", link:"https://autobarn.com.au/ab/Autobarn-Category/In-Car-Tech/Head-Units-%26-Speakers/Car-Subwoofers/c/68?srsltid=AfmBOoq9f9a--q39GScTjiAtZq1Acc3OknStx8wjwgWV05lzdQAFoBrU"},
+  "hidden_single_balanced": {title:"Pioneer TS-WX1210A", body:"12 inch driver, sealed, slim enough to fit under a seat. Built in amp, wires into the factory speaker leads through a line output converter (I'll cover install). Sexy, balanced audio output.", link:"https://automotivesuperstore.com.au/pioneer-ts-wx1210a?srsltid=AfmBOopmIumreePUpxTdih-7gACpEvBoRC5JSFiwog4H9Zf66D_jzFbqW30"},
+  "hidden_single_bigbass": {title:"Kicker Hideaway HS10", body:"10 inch driver, sealed, slim enclosure, built in amp, mounts to the under seat rails. Super bassy and powerful!", link:"https://www.bankstownsound.com.au/product/kicker-11hs8-2/"},
+  "hidden_dual_balanced": {title:"Two Pioneer TS-WX1210A", body:"TWO Pioneer WX1210a's! For when just one isn't enough bass. One under each front seat. 12 inch sealed driver, built in amp, balanced sexy audio output. I'll cover install!", link:"https://automotivesuperstore.com.au/pioneer-ts-wx1210a?srsltid=AfmBOopmIumreePUpxTdih-7gACpEvBoRC5JSFiwog4H9Zf66D_jzFbqW30"},
+  "hidden_dual_bigbass": {title:"Two Kicker Hideaway 51HS8", body:"TWO Kicker 51HS8's! For when just one isn't enough bass. One under each front seat. 10 inch driver and built in amp each side. Super bassy and powerful! I may need to save up a little before buying a second one of these + install......", link:"https://www.bankstownsound.com.au/product/kicker-11hs8-2/"}
+};
+
+function getResultKey(a1, a2, a3){
+  const location = (a1 === "B") ? "trunk" : "hidden";
+  const vibe = (a3 === "B") ? "bigbass" : "balanced";
+  const config = (a2 === "B") ? "dual" : "single";
+
+  return location + "_" + config + "_" + vibe;
+}
+
+function showStep(n){
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  document.querySelector(`.step[data-step="${n}"]`).classList.add("active");
+  document.querySelector(".result").classList.remove("active");
+
+  ["1","2","3"].forEach(i => {
+    const bar = document.querySelector(`.progress .q${i}`);
+    bar.classList.remove("done","active");
+    if(parseInt(i) < n) bar.classList.add("done");
+    else if(parseInt(i) === n) bar.classList.add("active");
+  });
+}
+
+document.querySelectorAll(".opt").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    spawnParticles(e.clientX, e.clientY);
+
+    const q = btn.dataset.q;
+    const v = btn.dataset.v;
+    answers[q] = v;
+
+    document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(b => b.classList.remove("picked"));
+    btn.classList.add("picked");
+
+    setTimeout(() => {
+      if(q === "1") showStep(2);
+      else if(q === "2") showStep(3);
+      else if(q === "3"){
+        const key = getResultKey(answers[1], answers[2], answers[3]);
+        const r = results[key];
+        document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+        document.getElementById("res-title").textContent = r.title;
+        document.getElementById("res-body").textContent = r.body;
+        document.getElementById("res-link").href = r.link;
+        document.querySelector(".result").classList.add("active");
+        document.querySelectorAll(".progress div").forEach(d => { d.classList.remove("active"); d.classList.add("done"); });
+      }
+    }, 200);
+  });
+});
+
+document.querySelectorAll(".back").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    spawnParticles(e.clientX, e.clientY);
+    showStep(parseInt(btn.dataset.back));
+  });
+});
+
+document.getElementById("restart").addEventListener("click", (e) => {
+  spawnParticles(e.clientX, e.clientY);
+  answers[1] = null; answers[2] = null; answers[3] = null;
+  document.querySelectorAll(".opt").forEach(b => b.classList.remove("picked"));
+  showStep(1);
+});
+</script>
+</body>
+</html>
